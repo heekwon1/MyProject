@@ -1,0 +1,9 @@
+diff a/sample.html b/sample.html	(rejected hunks)
+@@ -18,7 +18,6 @@
+ 		</style>
+ 	</head>
+ 	<body>
+-		<div id="left_area">
+ 없다
+ 	</body>
+ </html>
