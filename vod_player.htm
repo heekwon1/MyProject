@@ -1,0 +1,311 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- saved from url=(0014)about:internet -->
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"> 
+<head>
+	<title>KBS World Radio Player</title>
+	<meta name="google" value="notranslate" />         
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<?
+	include "/user/docs/kbs/include/vod_auth_inc.php";
+	if($date_chk == '') $date_chk = substr($broad_date,0,4);
+
+	if($width == '') $width=480;
+	if($height == '') $height=272;
+
+	$file_name = str_replace(" ","",$file_name);
+
+	if(preg_match('/(iPhone|iPad)/i',$_SERVER['HTTP_USER_AGENT'])) {
+		if($id == 'news_vod') $vod_url = $httpmediaurl.'news_vod/'.$date_chk.'/'.$file_name."/playlist.m3u8";
+		else if($id == 'today') $vod_url = $httpmediaurl.'today/'.$date_chk.'/'.$file_name."/playlist.m3u8";
+		else $vod_url = $httpmediaurl.$date_chk.'/'.$file_name."/playlist.m3u8";
+	} else if(preg_match('/(android)/i',$_SERVER['HTTP_USER_AGENT'])) {
+		if($id == 'news_vod') $vod_url = $rtspmediaurl.'news_vod/'.$date_chk.'/'.$file_name;
+		else if($id == 'today') $vod_url = $rtspmediaurl.'today/'.$date_chk.'/'.$file_name."/playlist.m3u8";
+		else $vod_url = $rtspmediaurl.$date_chk.'/'.$file_name;
+	} else {
+		if($id == 'news_vod') $vod_url = $rtmpmediaurl.'news_vod/'.$date_chk.'/'.$file_name;
+		else if($id == 'today') $vod_url = $rtmpmediaurl.'today/'.$date_chk.'/'.$file_name."/playlist.m3u8";
+		else $vod_url = $rtmpmediaurl.$date_chk.'/'.$file_name;
+	}
+
+
+	$playurl = GSUrl($vod_url,$sid,$authserver);
+
+
+	
+
+	if(preg_match('/(iphone|ipad)/i',$_SERVER['HTTP_USER_AGENT'])) {
+?>
+    <body topmargin="0" leftmargin="0">
+			<div class="vod_mobile">
+				<video width="<?=$width?>" height="<?=$height?>" controls>
+					<source src="<?=$playurl?>"/>
+				</video>
+			</div>
+	</body>
+<?
+	} else if(preg_match('/(android)/i',$_SERVER['HTTP_USER_AGENT'])) {
+?>
+    <body topmargin="0" leftmargin="0">
+	<!--
+				<video width="<?=$width?>" height="<?=$height?>" controls>
+					<source src="<?=$playurl?>"/>
+				</video>
+	-->
+			<div class="vod_mobile" style="position:relative;" >
+				<a href="<?=$playurl?>" ><img src="<?=$img_url?>" width="<?=$width?>" height="<?=$height?>"  ></a>
+				<a href="<?=$playurl?>" style="position:absolute;top:33%;left:37%;"><img src="http://world.kbs.co.kr/korean/event/pope_2014/images/playbtn.png" alt="" /></a>
+			</div>
+
+	</body>
+
+<?
+	} else {
+?>
+        <style type="text/css" media="screen"> 
+            object:focus { outline:none; }
+            #flashContent { display:none; }
+        </style>
+		<link rel="stylesheet" type="text/css" media="all" href="./css/player.css" />
+
+        <script type="text/javascript" src="js/swfobject.js"></script>
+        
+        <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+
+        <script src="js/jquery.ui.core.js"></script>
+		<script src="js/jquery.ui.widget.js"></script>
+		<script src="js/jquery.ui.mouse.js"></script>
+		<script src="js/jquery.ui.draggable.js"></script>
+
+        <script type="text/javascript" src="js/flashObject.js"></script>
+		<script type="text/javascript" src="js/common.js"></script>
+		<script type="text/javascript" src="js/StringUtil.js"></script>
+		<script type="text/javascript" src="js/common_480.js"></script>
+		<script type="text/javascript" src="js/cmethod_480.js"></script>
+<script type="text/javascript">
+<!--
+	//-----------------------------------------------------------------------------
+	//  initialize
+	//-----------------------------------------------------------------------------			
+$( document ).ready( function()
+{
+		embedFlash = new EmbedFlashObject();
+		embedFlash.addEventListener( "creationComplete", onFlashCreationComplete );
+		embedFlash.params.allowscriptaccess = "always";
+		embedFlash.drawFlashArea( "flashContent", "/vod/Main.swf", "100%", "100%" );
+
+		$("#vcon").draggable({ axis: 'x',
+							   containment: 'parent',
+							   drag: onVolumeDrag});
+		
+		//시작
+		$("#timebtn").draggable({ axis			: 'x',
+								  containment	: 'parent',
+								  drag			: onTimeDrag,
+								  start			: onTimeDragStart,
+								  stop			: onTimeDragStop  });
+		$( "#timepast" ).click( onTimepastClick );
+		$( "#time" ).click( onTimepastClick );
+		//시작
+		
+		checkFlashVerion();		
+		
+});
+
+
+//-----------------------------------------------------------------------------
+//  Variables
+/*//-----------------------------------------------------------------------------
+	var thisPageMode = "";
+	var embedFlash;
+	var movieList = [];
+	var movieListHost = ["rtmp://kbsmp4.kbs.gscdn.com/world/_definst_/"];
+	var movieListVstream = ["<?=$playurl?>"];
+	var movieListMode = ["BR"];
+	var movieListISLIVE = [false];
+	var movieListClick = [true];
+	var movieListClickURL = [""];
+	var movieListIMP = [""];
+	var movieListACTION = [""];
+	var currentMovieIndex = 0;
+	var adCount = 0;
+	var clickUrl = "";
+	var timer;
+*/
+	var thisPageMode = "";
+	var embedFlash;
+	var movieList = [];
+	var movieListHost = ["http://world.kbs.co.kr/","rtmp://kbsmp4.kbs.gscdn.com/world/_definst_/"];
+	var movieListVstream = ["<?=$img_url?>","<?=$playurl?>"];
+	var movieListMode = ["BR","BR"];
+	var movieListISLIVE = [false,false];
+	var movieListClick = [false,false];
+	var movieListClickURL = ["",""];
+	var movieListIMP = ["",""];
+	var movieListusePoster = [true,false];
+	var movieListposterURLs = ["<?=$img_url?>",""];
+	var movieListACTION = ["",""];
+	var currentMovieIndex = 0;
+	var adCount = 0;
+	var clickUrl = "";
+	var timer;
+	var movieListuseCaption = [false,<?=$smi_chk?>];
+	var movieListcaptionURL = ["","<?=$smi_url?>"];
+//	var movieListuseCaption = [false,true];
+//	var movieListcaptionURL = ["","/jss/player/test.smi"];
+
+	//---------------------------------
+	//  Variables : Flag
+	//---------------------------------
+	var isButtonConfigure = false;
+	var isReload = false;
+	var isStop = false;
+	var isSeek = false;
+	var isComplete = false;
+	var isLastVolumeVal = "not";
+	var naviInfo = navigator.userAgent;	
+	//시작
+	function onTimepastClick( event )
+	{
+
+		//현재 영상이 광고이면 seek disable
+		if((currentMovieIndex+1) <= adCount) return false;
+
+		if( event.target.tagName.toLowerCase() == "img" || true == isComplete)
+		{
+			return false;
+		}
+		var posX = (naviInfo.indexOf('MSIE')> -1) ? event.offsetX : event.pageX;
+		var posY = (naviInfo.indexOf('MSIE')> -1) ? event.offsetY : event.pageY;
+		var thumbW = $("#time > img").width();
+		var targetX = posX - ( thumbW / 2 );
+		
+		if( posX + thumbW > $("#time").width() )
+		{
+			targetX = $("#time").width() - thumbW;
+		}
+		else if( targetX < 0 )
+		{
+			targetX = 0;
+		}
+		
+		$("#time > img").css("left", targetX + "px" );
+		$("#timepast").css("width", posX );
+		
+		var duration = embedFlash.flashObj.getDuration();
+		var thumbW = $("#time > img").width();
+		var tw = $("#time").width() - thumbW;
+		
+		var time = targetX * duration / tw;
+		isSeek = true;
+		embedFlash.flashObj.seek( time );
+		
+		setTimeout( "clearSeekStatus()", 500 );
+		
+		event.stopPropagation();
+	}
+	
+	function clearSeekStatus()
+	{
+		isSeek = false;
+		updateTimeBar();
+	}
+ 
+	//마우스클릭,키보드 막기
+/*
+	  function m_click() {
+	    if ((event.button==2) || (event.button==3) || (event.keyCode == 93)) {
+	      return false;
+	    }
+	    else {
+	      if((event.ctrlKey) || (event.shiftKey)) {
+	        return false;
+	      }
+		}
+	  }
+	  function keypressed() { 
+				event.keyCode = 0; 
+				event.cancelBubble = true; 
+				event.returnValue = false; 
+	  }
+	   
+	  document.onmousedown=m_click;
+	  document.onkeydown=keypressed;
+*/
+//-->		  
+</script> 
+
+
+<script type="text/javascript">
+
+
+	function chk_play(){
+		currentMovieIndex = 1;
+
+		mediaContentSet(currentMovieIndex);
+		callAdUrlJs(currentMovieIndex,'start');
+		document.getElementById("play_btn").innerHTML = '<img src="./images/btn_play_n.gif" alt="재생" >';
+	}
+
+
+</script>
+    </head>
+    <body topmargin="0" leftmargin="0">
+    <!-- player -->
+
+
+	<div id="screen" style="width:<?=$width?>px">
+        <div class="player_area">
+            <div class="inner">
+            	<div id="player" style="width:<?=$width?>px; height:<?=$height?>px;">
+            		<div id="flashContent">
+						<p>
+							To view this page ensure that Adobe Flash Player version 
+							10.2.0 or greater is installed. 
+						</p>
+						<script type="text/javascript"> 
+							var pageHost = ((document.location.protocol == "https:") ? "https://" : "http://"); 
+							document.write("<a href='http://www.adobe.com/go/getflashplayer'><img src='" 
+											+ pageHost + "www.adobe.com/images/shared/download_buttons/get_flash_player.gif' alt='Get Adobe Flash player' /></a>" ); 
+						</script> 
+	            		<!--
+						<img src="./images/paly_img.gif" alt="" />
+						-->
+					</div>
+                </div>
+            </div>
+            <div class="time" id="time">
+            	<span class="past" id="timepast"></span>
+                <img src="./images/btn_time.gif" alt="" id="timebtn" class="draggable" style="cursor:pointer" />               
+            </div>
+            <div id="control">
+            	<a href="#url" id="play_btn"><img src="./images/btn_play_n.gif" alt="재생" onclick="javascript:chk_play()" /></a>
+                <a id="mstop" href="#url"><img src="./images/btn_stop_n.gif" alt="정지" /></a>
+                <a id="mup"   href="#url" onclick="return false;"><img src="./images/btn_up_n.gif" alt="앞으로" /></a>
+                <a id="mdown" href="#url" onclick="return false;"><img src="./images/btn_down_n.gif" alt="뒤로" /></a>
+                <div id="volume" class="volume_on">
+                	<a href="#url" onclick="volume_mute('0.5'); return false;" class="btn">음소거</a>
+                    <!-- mute상태에서 클릭시 volume_mute('볼륨%값') : 볼륨%값 = 원하는숫자 -->
+                    <div id="gage">
+                    	<span id="volumegage"></span>
+                        <img src="./images/btn_volume.gif" alt="볼륨조절버튼" id="vcon" class="draggable" style="cursor:pointer" />
+                    </div>
+                </div>
+            </div>
+            <div class="ch_time">
+	         	<?=urldecode($title)?>
+                <span id="timeTxt">
+                00:00 / 00:00
+                </span>
+            </div>
+        </div>        
+    
+    </div>
+    <!-- //player -->
+   </body>
+</html>
+<?
+	}
+?>
+
+<?include "/user/docs/kbs/include/script.php"?>
