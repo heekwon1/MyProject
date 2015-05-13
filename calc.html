@@ -1,0 +1,108 @@
+
+<!DOCTYPE HTML>
+<html lang="ko">
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no">
+<link href="http://zzaa0303.dothome.co.kr/portfolio/common/base.css" rel="stylesheet" type="text/css" />
+<title>...</title>
+<style type="text/css">
+.calculator {width:270px; margin:200px auto 0 auto; border-radius:5px; background:#d9e4f1; box-shadow: 4px 4px 5px #888888;}
+.calculator p {font-size:24px; font-weight:bold; text-align:center;padding-top:10px}
+.box {width:270px;   padding:17px 8px 17px 8px;}
+#iSearch {width:251px; height:50px; text-align: right;}
+label, legend {display:none}
+button {width:80px;  height:50px; margin:3px 3px 3px 0}
+.numberbody {padding:5px 0 0 0}
+.result {width:167px}
+.plus {width:58px}
+.calculator .no {width:59px}
+</style>
+</head>
+<body>
+<div class="calculator">
+<p>계산기</p>
+	<!--<form action="">-->
+		<!--<fieldset>-->
+			<legend>계산기</legend>
+			<div class="box">
+				<input type="text" id="iSearch" class="_resultInputBox" value="" disabled/><label for="iSearch" class="iLabel">결과값</label>
+				<div class="numberbody">
+					<button class="plus">-</button>
+					<button class="plus">+</button>
+					<button class="plus">/</button>
+					<button class="plus no">*</button>
+					<button>7</button>
+					<button>8</button>
+					<button>9</button>
+					<button>4</button>
+					<button>5</button>
+					<button>6</button>
+					<button>1</button>
+					<button>2</button>
+					<button>3</button>
+					<button>0</button>
+					<button class="result">=</button>
+
+				</div>
+			</div>
+		<!--</fieldset>-->
+	<!--</form>-->
+</div>
+<script type="text/javascript">
+	var Calculator = function(){
+		this.init.apply(this, arguments);
+	};
+
+	Calculator.prototype = {
+		init : function(options){
+			this._initData();
+			this._assignElements();
+			this._addEventListener();
+		},
+
+		_initData : function(){
+			this._nResult = 0;
+			this._sCurrentInput = "";
+		},
+
+		_assignElements : function(){
+			this._elements = {
+				resultInput : document.querySelector("._resultInputBox"),
+				calcButtons : document.querySelector(".numberbody")
+			}
+		},
+
+		_addEventListener : function(){
+			this._elements.calcButtons.addEventListener("click", this._onClickButton.bind(this));
+		},
+
+		_onClickButton : function(event){
+			var sValue = event.toElement.textContent;
+
+			if(this._isNum(sValue)){
+				this._attachInputValue(sValue);
+				this._showCurrentInput();
+			}else{
+
+			}
+		},
+
+		_isNum : function(sValue){
+			return (isNaN(parseInt(sValue,10)) === false);
+		},
+
+		_attachInputValue : function(sValue){
+			this._sCurrentInput += sValue;
+		},
+
+		_showCurrentInput : function(){
+			this._elements.resultInput.value = this._sCurrentInput;
+		}
+	};
+
+	new Calculator();
+</script>
+</body>
+</html>
